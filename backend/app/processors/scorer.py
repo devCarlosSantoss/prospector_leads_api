@@ -38,6 +38,7 @@ class LeadScorer:
         email = lead.get("email", "") or ""
         name = lead.get("company_name", "") or ""
         lead_city = lead.get("lead_city", "") or ""
+        niche = lead.get("niche", "") or lead.get("category", "") or ""
 
         is_directory = self._is_directory_url(website)
         is_social_only = self._is_social_url(website) and not is_directory
@@ -124,6 +125,7 @@ class LeadScorer:
             "score_reason": "; ".join(reasons),
             "opportunity": opportunity,
             "suggested_service": "; ".join(suggested_service) if suggested_service else "Análise comercial necessária",
+            "suggested_message": self._generate_message(lead),
             "next_action": self._get_next_action(score, has_real_website, has_whatsapp, has_instagram, name),
         }
 
@@ -184,6 +186,88 @@ class LeadScorer:
         if has_site:
             return "Presença web existente — oportunidades de modernização e automação"
         return "Oportunidade de prospecção comercial"
+
+    def _generate_message(self, lead: dict) -> str:
+        name = lead.get("company_name", "") or ""
+        if not name:
+            return ""
+
+        niche = (lead.get("niche") or lead.get("category") or "").strip()
+        city = (lead.get("lead_city") or lead.get("city") or "").strip()
+        website = (lead.get("website") or "").strip()
+        has_site = bool(website)
+        has_whats = bool(lead.get("phone") or lead.get("whatsapp_link") or lead.get("has_whatsapp"))
+        has_insta = bool(lead.get("instagram") or lead.get("instagram_active"))
+        has_landing = bool(lead.get("has_landing_page"))
+        is_social = self._is_social_url(website)
+        is_weak = self._check_weak_website(website)
+        is_dir = self._is_directory_url(website)
+        has_real_site = has_site and not is_dir and not is_social
+
+        greetings = ["Olá", "Opa", "Fala", "Ei"]
+        greeting = greetings[hash(name) % len(greetings)]
+
+        if not has_site and has_insta:
+            return (
+                f"{greeting} {name}! 👋\n\n"
+                f"Vi que vocês estão presentes no Instagram, mas reparei que ainda não têm um site próprio. "
+                f"Um site institucional passa mais credibilidade e ajuda a converter seguidores em clientes de verdade. "
+                f"Posso ajudar a criar um site profissional e integrado com o Instagram de vocês. "
+                f"Vamos conversar sobre isso? 😊"
+            )
+
+        if not has_site and not has_insta:
+            return (
+                f"{greeting} {name}! 👋\n\n"
+                f"Recentemente pesquisei sobre {niche or 'o ramo de vocês'} em {city or 'a região'} "
+                f"e notei que {name} ainda não tem presença digital (site ou redes sociais). "
+                f"Hoje em dia, ter um site é essencial para ser encontrado por novos clientes. "
+                f"Gostaria de apresentar uma solução completa de site institucional + ferramentas digitais para o negócio de vocês. "
+                f"Topa uma conversa rápida?"
+            )
+
+        if not has_real_site and has_insta:
+            return (
+                f"{greeting} {name}! 👋\n\n"
+                f"Vi que vocês estão ativos nas redes sociais, mas senti falta de um site próprio. "
+                f"Ter um site institucional ajuda a fortalecer a marca e passar mais confiança para quem pesquisa por {niche or 'seus serviços'} no Google. "
+                f"Posso preparar uma proposta de site profissional para {name}. Me chama pra gente conversar? 😊"
+            )
+
+        if has_real_site and is_weak:
+            return (
+                f"{greeting} {name}! 👋\n\n"
+                f"Acessei o site de vocês e vi que ele pode ser mais moderno e rápido. "
+                f"Um site atualizado passa mais confiança e aparece melhor no Google. "
+                f"Posso ajudar a criar um site profissional, otimizado para celular e com WhatsApp integrado. "
+                f"Vamos conversar sobre isso?"
+            )
+
+        if has_real_site and not has_whats:
+            return (
+                f"{greeting} {name}! 👋\n\n"
+                f"Vi que {name} tem site, mas não encontrei um canal de WhatsApp para atendimento rápido. "
+                f"Sabia que colocar WhatsApp no site pode aumentar as conversas de clientes em até 40%? "
+                f"Posso ajudar a integrar WhatsApp Business no site de vocês, além de outras melhorias. "
+                f"Bora bater um papo?"
+            )
+
+        if has_real_site and has_whats and not has_landing:
+            return (
+                f"{greeting} {name}! 👋\n\n"
+                f"{name} já tem site e WhatsApp, mas e as landing pages? "
+                f"Landing pages são páginas focadas em campanhas específicas que convertem muito mais visitantes em clientes. "
+                f"Posso apresentar como isso pode trazer ainda mais resultados para o negócio de vocês. "
+                f"Vamos marcar uma conversa?"
+            )
+
+        return (
+            f"{greeting} {name}! 👋\n\n"
+            f"{name} já tem uma boa presença digital! 🚀\n\n"
+            f"Gostaria de apresentar soluções para turbinar ainda mais os resultados: "
+            f"automação de atendimento, CRM, campanhas pagas e estratégias avançadas. "
+            f"Vou preparar uma proposta personalizada — podemos agendar uma call?"
+        )
 
     def _get_next_action(self, score: int, has_site: bool, has_whats: bool, has_insta: bool, name: str) -> str:
         if score >= 70:

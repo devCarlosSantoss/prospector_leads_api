@@ -44,6 +44,7 @@ class LeadUpdate(BaseModel):
     auto_notes: Optional[str] = None
     opportunity: Optional[str] = None
     suggested_service: Optional[str] = None
+    suggested_message: Optional[str] = None
     next_action: Optional[str] = None
     commercial_status: Optional[str] = None
     contacted: Optional[bool] = None

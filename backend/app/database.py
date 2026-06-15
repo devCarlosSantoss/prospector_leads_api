@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 from app.config import DATABASE_URL
@@ -23,3 +23,9 @@ def get_db():
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE leads ADD COLUMN suggested_message TEXT DEFAULT ''"))
+            conn.commit()
+    except Exception:
+        pass

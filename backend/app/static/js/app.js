@@ -464,6 +464,8 @@ function renderLeadDetail(lead) {
         ${textarea('Motivo Score','score_reason', lead.score_reason, 3)}
         ${field('Oportunidade','opportunity', lead.opportunity)}
         ${field('Serviço Sugerido','suggested_service', lead.suggested_service)}
+        <div class="field"><label class="label">Mensagem Sugerida</label><textarea class="textarea has-text-weight-medium" id="ed-suggested_message" rows="4" readonly style="background:#f5f5f5;border-left:3px solid #00d1b2;font-size:0.95em">${h(lead.suggested_message||'')}</textarea>
+        <button class="button is-small is-light mt-1" onclick="copyMessage(${lead.id})">Copiar mensagem</button></div>
         ${textarea('Próxima Ação','next_action', lead.next_action, 2)}
         <div class="field is-grouped is-grouped-multiline">
           <div class="control"><label class="checkbox"><input type="checkbox" id="ed-has_website" ${lead.has_website?'checked':''}> Tem site?</label></div>
@@ -675,4 +677,20 @@ async function fetchSourceChart() {
     if (sourceChart) sourceChart.destroy();
     sourceChart = new Chart(ctx, { type:'pie', data: { labels:Object.keys(counts), datasets:[{ data:Object.values(counts), backgroundColor:['#485fc7','#00d1b2','#ffdd57','#ff3860','#23d160','#3273dc','#ff470f','#7a7a7a'] }] }, options:{ responsive:true, plugins:{ legend:{ position:'bottom' } } } });
   } catch(e) {}
+}
+
+function copyMessage(id) {
+  const el = document.getElementById('ed-suggested_message');
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copiado!';
+    btn.classList.add('is-success');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('is-success'); }, 2000);
+  }).catch(() => {
+    el.select();
+    el.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+  });
 }

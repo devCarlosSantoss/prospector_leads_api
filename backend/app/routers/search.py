@@ -125,6 +125,7 @@ async def run_search_task(
                 auto_notes=str(result.get("auto_notes", ""))[:1000],
                 opportunity=str(result.get("opportunity", ""))[:500],
                 suggested_service=str(result.get("suggested_service", ""))[:500],
+                suggested_message=str(result.get("suggested_message", "")),
                 next_action=str(result.get("next_action", ""))[:500],
                 commercial_status="novo",
                 temperature="frio",

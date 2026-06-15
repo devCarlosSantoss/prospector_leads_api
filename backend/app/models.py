@@ -67,6 +67,7 @@ class Lead(Base):
     auto_notes = Column(Text, default="")
     opportunity = Column(String(500), default="")
     suggested_service = Column(String(500), default="")
+    suggested_message = Column(Text, default="")
     next_action = Column(String(500), default="")
 
     contacted = Column(Boolean, default=False)
