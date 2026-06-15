@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="columns">
+  <div class="column is-12">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="/leads">Leads</a></li>
+        <li class="is-active"><a href="#" id="breadcrumbLead">Carregando...</a></li>
+      </ul>
+    </nav>
+
+    <div id="leadDetail">
+      <div class="has-text-centered py-6">
+        <span class="icon is-large has-text-grey-light"><i class="fas fa-spinner fa-pulse fa-3x"></i></span>
+        <p class="has-text-grey">Carregando lead...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const LEAD_ID = {{ lead_id }};
+  const STATUSES = {{ statuses | tojson }};
+  const CHANNELS = {{ channels | tojson }};
+  const TEMPERATURES = {{ temperatures | tojson }};
+</script>
+{% endblock %}

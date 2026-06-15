@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="columns">
+  <div class="column is-12">
+    <div class="level">
+      <div class="level-left">
+        <h1 class="title is-4">
+          <span class="icon"><i class="fas fa-list"></i></span>
+          Leads Encontrados
+        </h1>
+      </div>
+      <div class="level-right">
+        <div class="buttons">
+          <a class="button is-success" href="/api/export/excel" id="exportExcelBtn">
+            <span class="icon"><i class="fas fa-file-excel"></i></span>
+            <span>Exportar Excel</span>
+          </a>
+          <a class="button is-info" href="/api/export/csv" id="exportCsvBtn">
+            <span class="icon"><i class="fas fa-file-csv"></i></span>
+            <span>Exportar CSV</span>
+          </a>
+          <button class="button is-warning" id="importBtn">
+            <span class="icon"><i class="fas fa-upload"></i></span>
+            <span>Importar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="box">
+      <div class="columns is-multiline is-vcentered">
+        <div class="column is-2">
+          <div class="field">
+            <label class="label is-small">Buscar</label>
+            <div class="control">
+              <input class="input is-small" type="text" id="filterSearch" placeholder="Nome, telefone...">
+            </div>
+          </div>
+        </div>
+        <div class="column is-2">
+          <div class="field">
+            <label class="label is-small">Nicho</label>
+            <div class="control">
+              <input class="input is-small" type="text" id="filterNiche" placeholder="Nicho">
+            </div>
+          </div>
+        </div>
+        <div class="column is-2">
+          <div class="field">
+            <label class="label is-small">Cidade</label>
+            <div class="control">
+              <input class="input is-small" type="text" id="filterCity" placeholder="Cidade">
+            </div>
+          </div>
+        </div>
+        <div class="column is-1">
+          <div class="field">
+            <label class="label is-small">Qualidade</label>
+            <div class="control">
+              <div class="select is-small is-fullwidth">
+                <select id="filterQuality">
+                  <option value="">Todas</option>
+                  <option value="quente">Quente</option>
+                  <option value="morno">Morno</option>
+                  <option value="frio">Frio</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column is-2">
+          <div class="field">
+            <label class="label is-small">Status Comercial</label>
+            <div class="control">
+              <div class="select is-small is-fullwidth">
+                <select id="filterStatus">
+                  <option value="">Todos</option>
+                  {% for s in statuses %}
+                  <option value="{{ s }}">{{ s }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column is-1">
+          <div class="field">
+            <label class="label is-small">Temp.</label>
+            <div class="control">
+              <div class="select is-small is-fullwidth">
+                <select id="filterTemperature">
+                  <option value="">Todas</option>
+                  {% for t in temperatures %}
+                  <option value="{{ t }}">{{ t }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column is-1">
+          <div class="field">
+            <label class="label is-small">Campanha</label>
+            <div class="control">
+              <div class="select is-small is-fullwidth">
+                <select id="filterCampaign">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column is-1">
+          <label class="label is-small">&nbsp;</label>
+          <button class="button is-primary is-small is-fullwidth" id="applyFilters">
+            <span class="icon"><i class="fas fa-filter"></i></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div id="bulkActions" class="box" style="display:none;">
+      <div class="level">
+        <div class="level-left">
+          <span class="has-text-weight-bold" id="selectedCount">0 selecionados</span>
+        </div>
+        <div class="level-right">
+          <div class="buttons are-small">
+            <button class="button is-success" onclick="bulkUpdate('interested', true)">Marcar Interessado</button>
+            <button class="button is-danger" onclick="bulkUpdate('contacted', true)">Marcar Contatado</button>
+            <button class="button is-warning" onclick="bulkUpdate('temperature', 'quente')">Temperatura Quente</button>
+            <button class="button is-danger is-light" onclick="bulkUpdate('commercial_status', 'lead inválido')">Lead Inválido</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="table is-striped is-hoverable is-fullwidth" id="leadsTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>Empresa</th>
+            <th>Telefone</th>
+            <th>Site</th>
+            <th>Cidade</th>
+            <th>Qualidade</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th>Temp.</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="leadsBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+      <button class="pagination-previous" id="prevPage">Anterior</button>
+      <button class="pagination-next" id="nextPage">Próximo</button>
+      <ul class="pagination-list" id="paginationList"></ul>
+    </nav>
+    <p class="help has-text-centered" id="paginationInfo"></p>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal" id="importModal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Importar Leads</p>
+      <button class="delete" data-dismiss="modal"></button>
+    </header>
+    <section class="modal-card-body">
+      <p class="mb-2">Selecione um arquivo CSV (separado por ponto e vírgula) para importar.</p>
+      <div class="field">
+        <div class="file is-boxed">
+          <label class="file-label">
+            <input class="file-input" type="file" id="importFile" accept=".csv">
+            <span class="file-cta">
+              <span class="file-icon"><i class="fas fa-upload"></i></span>
+              <span class="file-label">Selecionar arquivo CSV</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div id="importResult" class="mt-2"></div>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success" id="doImport">Importar</button>
+      <button class="button" data-dismiss="modal">Cancelar</button>
+    </footer>
+  </div>
+</div>
+{% endblock %}

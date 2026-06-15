@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="columns">
+  <div class="column is-12">
+    <div class="box">
+      <h1 class="title is-4">
+        <span class="icon"><i class="fas fa-search"></i></span>
+        Nova Busca de Leads
+      </h1>
+
+      <form id="searchForm">
+        <div class="columns">
+          <div class="column is-4">
+            <div class="field">
+              <label class="label">Nicho</label>
+              <div class="control has-icons-left">
+                <input class="input" type="text" id="niche" placeholder="Ex: clínica odontológica" required>
+                <span class="icon is-left"><i class="fas fa-industry"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="column is-4">
+            <div class="field">
+              <label class="label">Cidade</label>
+              <div class="control has-icons-left">
+                <input class="input" type="text" id="city" placeholder="Ex: Vitória ES" required>
+                <span class="icon is-left"><i class="fas fa-city"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="column is-4">
+            <div class="field">
+              <label class="label">Campanha (opcional)</label>
+              <div class="control has-icons-left">
+                <div class="select is-fullwidth">
+                  <select id="campaignSelect">
+                    <option value="">Sem campanha</option>
+                  </select>
+                </div>
+                <span class="icon is-left"><i class="fas fa-folder"></i></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-12">
+            <label class="label">Fontes de Busca</label>
+            <div class="field is-grouped is-grouped-multiline">
+              <div class="control">
+                <label class="checkbox">
+                  <input type="checkbox" class="source-checkbox" value="google_maps" checked>
+                  Google Maps
+                </label>
+              </div>
+              <div class="control">
+                <label class="checkbox">
+                  <input type="checkbox" class="source-checkbox" value="duckduckgo" checked>
+                  DuckDuckGo
+                </label>
+              </div>
+              <div class="control">
+                <label class="checkbox">
+                  <input type="checkbox" class="source-checkbox" value="apontador" checked>
+                  Apontador
+                </label>
+              </div>
+              <div class="control">
+                <label class="checkbox">
+                  <input type="checkbox" class="source-checkbox" value="lista_brasil" checked>
+                  Lista Brasil
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="control">
+            <button class="button is-primary is-medium" type="submit" id="searchBtn">
+              <span class="icon"><i class="fas fa-play"></i></span>
+              <span>Iniciar Busca</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Progress Section (hidden initially) -->
+    <div id="progressSection" class="box" style="display:none;">
+      <h2 class="title is-5">Progresso da Busca</h2>
+      <progress class="progress is-primary" id="searchProgress" value="0" max="100">0%</progress>
+      <p class="help" id="progressText">Iniciando busca...</p>
+
+      <div class="field">
+        <label class="label">Log das Fontes</label>
+        <div id="sourceLog" class="log-box"></div>
+      </div>
+    </div>
+
+    <!-- Results Section (hidden initially) -->
+    <div id="resultsSection" class="box" style="display:none;">
+      <div class="level">
+        <div class="level-left">
+          <h2 class="title is-5">
+            <span class="icon"><i class="fas fa-check-circle has-text-success"></i></span>
+            Resultados Encontrados
+          </h2>
+        </div>
+        <div class="level-right">
+          <span class="tag is-info is-medium" id="resultCount">0 leads</span>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="table is-striped is-hoverable is-fullwidth" id="resultsTable">
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Telefone</th>
+              <th>Site</th>
+              <th>Fonte</th>
+              <th>Qualidade</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <a class="button is-success" href="/leads">
+          <span class="icon"><i class="fas fa-arrow-right"></i></span>
+          <span>Ver Todos os Leads</span>
+        </a>
+        <button class="button is-info" onclick="location.reload()">
+          <span class="icon"><i class="fas fa-redo"></i></span>
+          <span>Nova Busca</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="box">
+      <h2 class="title is-5">
+        <span class="icon"><i class="fas fa-history"></i></span>
+        Histórico de Buscas
+      </h2>
+      <div class="table-container">
+        <table class="table is-striped is-fullwidth" id="historyTable">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Nicho</th>
+              <th>Cidade</th>
+              <th>Leads</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

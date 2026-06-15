@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="columns">
+  <div class="column is-12">
+    <h1 class="title is-4">
+      <span class="icon"><i class="fas fa-chart-bar"></i></span>
+      Dashboard
+    </h1>
+  </div>
+</div>
+
+<!-- Metrics Cards -->
+<div class="columns is-multiline" id="metricsCards">
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Total de Leads</p>
+      <p class="title is-3" id="totalLeads">0</p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Contatados</p>
+      <p class="title is-3" id="contactedCount">0</p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Interessados</p>
+      <p class="title is-3" id="interestedCount">0</p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Fechados</p>
+      <p class="title is-3" id="closedCount">0</p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Propostas Enviadas</p>
+      <p class="title is-3" id="proposalsCount">0</p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Com Site</p>
+      <p class="title is-3" id="withWebsite">0</p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Sem Site</p>
+      <p class="title is-3" id="withoutWebsite">0</p>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="box metric-box has-text-centered">
+      <p class="heading">Taxa Conversão</p>
+      <p class="title is-3" id="conversionRate">0%</p>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="columns">
+  <div class="column is-6">
+    <div class="box">
+      <h2 class="title is-6">Leads por Qualidade</h2>
+      <canvas id="qualityChart"></canvas>
+    </div>
+  </div>
+  <div class="column is-6">
+    <div class="box">
+      <h2 class="title is-6">Status Comercial</h2>
+      <canvas id="statusChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="columns">
+  <div class="column is-6">
+    <div class="box">
+      <h2 class="title is-6">Distribuição por Fonte</h2>
+      <canvas id="sourceChart"></canvas>
+    </div>
+  </div>
+  <div class="column is-6">
+    <div class="box">
+      <h2 class="title is-6">Leads com e sem Site</h2>
+      <canvas id="websiteChart"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}

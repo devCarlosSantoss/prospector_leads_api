@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadFinder - Prospecção B2B</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <nav class="navbar is-dark is-fixed-top" role="navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#">
+        <span class="icon-text">
+          <span class="icon"><i class="fas fa-bullseye"></i></span>
+          <span><strong>LeadFinder</strong></span>
+        </span>
+      </a>
+      <a role="button" class="navbar-burger" data-target="navMenu">
+        <span></span><span></span><span></span>
+      </a>
+    </div>
+    <div id="navMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="#/" data-page="search">
+          <span class="icon"><i class="fas fa-search"></i></span><span>Buscar Leads</span>
+        </a>
+        <a class="navbar-item" href="#/leads" data-page="leads">
+          <span class="icon"><i class="fas fa-list"></i></span><span>Leads</span>
+        </a>
+        <a class="navbar-item" href="#/campaigns" data-page="campaigns">
+          <span class="icon"><i class="fas fa-folder"></i></span><span>Campanhas</span>
+        </a>
+        <a class="navbar-item" href="#/dashboard" data-page="dashboard">
+          <span class="icon"><i class="fas fa-chart-bar"></i></span><span>Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="section" style="margin-top: 3.25rem;">
+    <div class="container">
+
+      <!-- SEARCH PAGE -->
+      <div id="page-search" class="page">
+        <div class="columns"><div class="column is-12">
+          <div class="box">
+            <h1 class="title is-4"><span class="icon"><i class="fas fa-search"></i></span> Nova Busca de Leads</h1>
+            <form id="searchForm">
+              <div class="columns">
+                <div class="column is-4">
+                  <div class="field">
+                    <label class="label">Nicho</label>
+                    <div class="control has-icons-left">
+                      <input class="input" type="text" id="niche" placeholder="Ex: clínica odontológica" required>
+                      <span class="icon is-left"><i class="fas fa-industry"></i></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="column is-3">
+                  <div class="field">
+                    <label class="label">Cidade</label>
+                    <div class="control has-icons-left">
+                      <input class="input" type="text" id="city" placeholder="Ex: Vitória ES" required>
+                      <span class="icon is-left"><i class="fas fa-city"></i></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="column is-2">
+                  <div class="field">
+                    <label class="label">País</label>
+                    <div class="control has-icons-left">
+                      <input class="input" type="text" id="country" value="Brasil" placeholder="Ex: Brasil">
+                      <span class="icon is-left"><i class="fas fa-globe"></i></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="column is-1">
+                  <div class="field">
+                    <label class="label">Limite</label>
+                    <div class="control">
+                      <input class="input" type="number" id="maxResults" value="50" min="10" max="500" placeholder="50">
+                    </div>
+                  </div>
+                </div>
+                <div class="column is-2">
+                  <div class="field">
+                    <label class="label">Campanha (opcional)</label>
+                    <div class="control has-icons-left">
+                      <div class="select is-fullwidth">
+                        <select id="campaignSelect"><option value="">Sem campanha</option></select>
+                      </div>
+                      <span class="icon is-left"><i class="fas fa-folder"></i></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="columns">
+                <div class="column is-12">
+                  <label class="label">Fontes</label>
+                  <div class="field is-grouped is-grouped-multiline">
+                    <div class="control"><label class="checkbox"><input type="checkbox" class="source-checkbox" value="google_maps" checked> Google Maps</label></div>
+                    <div class="control"><label class="checkbox"><input type="checkbox" class="source-checkbox" value="duckduckgo" checked> DuckDuckGo</label></div>
+                    <div class="control"><label class="checkbox"><input type="checkbox" class="source-checkbox" value="apontador"> Apontador</label></div>
+                    <div class="control"><label class="checkbox"><input type="checkbox" class="source-checkbox" value="lista_brasil"> Lista Brasil</label></div>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <button class="button is-primary is-medium" type="submit" id="searchBtn">
+                    <span class="icon"><i class="fas fa-play"></i></span><span>Iniciar Busca</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div id="progressSection" class="box" style="display:none;">
+            <h2 class="title is-5">Progresso</h2>
+            <progress class="progress is-primary" id="searchProgress" value="0" max="100">0%</progress>
+            <p class="help" id="progressText">Iniciando...</p>
+            <div class="field">
+              <label class="label">Log das Fontes</label>
+              <div id="sourceLog" class="log-box"></div>
+            </div>
+          </div>
+
+          <div id="resultsSection" class="box" style="display:none;">
+            <div class="level">
+              <div class="level-left"><h2 class="title is-5"><span class="icon"><i class="fas fa-check-circle has-text-success"></i></span> Resultados</h2></div>
+              <div class="level-right"><span class="tag is-info is-medium" id="resultCount">0 leads</span></div>
+            </div>
+            <div class="table-container">
+              <table class="table is-striped is-hoverable is-fullwidth" id="resultsTable">
+                <thead><tr><th>Empresa</th><th>Telefone</th><th>Site</th><th>Fonte</th><th>Qualidade</th><th>Score</th></tr></thead>
+                <tbody id="resultsBody"></tbody>
+              </table>
+            </div>
+            <div class="buttons">
+              <a class="button is-success" href="#/leads"><span class="icon"><i class="fas fa-arrow-right"></i></span><span>Ver Todos os Leads</span></a>
+              <button class="button is-info" onclick="window.location.reload()"><span class="icon"><i class="fas fa-redo"></i></span><span>Nova Busca</span></button>
+            </div>
+          </div>
+
+          <div class="box">
+            <h2 class="title is-5"><span class="icon"><i class="fas fa-history"></i></span> Histórico</h2>
+            <div class="table-container">
+              <table class="table is-striped is-fullwidth" id="historyTable">
+                <thead><tr><th>Data</th><th>Nicho</th><th>Cidade</th><th>País</th><th>Leads</th><th>Status</th></tr></thead>
+                <tbody id="historyBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <!-- LEADS PAGE -->
+      <div id="page-leads" class="page" style="display:none;">
+        <div class="columns"><div class="column is-12">
+          <div class="level">
+            <div class="level-left"><h1 class="title is-4"><span class="icon"><i class="fas fa-list"></i></span> Leads</h1></div>
+            <div class="level-right">
+              <div class="buttons">
+                <button class="button is-primary" onclick="showModal('addLeadModal')"><span class="icon"><i class="fas fa-plus"></i></span><span>Adicionar Lead</span></button>
+                <button class="button is-success" id="exportExcelBtn"><span class="icon"><i class="fas fa-file-excel"></i></span><span>Excel</span></button>
+                <button class="button is-info" id="exportCsvBtn"><span class="icon"><i class="fas fa-file-csv"></i></span><span>CSV</span></button>
+                <button class="button is-warning" id="importBtn"><span class="icon"><i class="fas fa-upload"></i></span><span>Importar</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="columns is-multiline is-vcentered">
+              <div class="column is-2"><div class="field"><label class="label is-small">Buscar</label><div class="control"><input class="input is-small" type="text" id="filterSearch" placeholder="Nome, telefone..."></div></div></div>
+              <div class="column is-2"><div class="field"><label class="label is-small">Nicho</label><div class="control"><input class="input is-small" type="text" id="filterNiche"></div></div></div>
+              <div class="column is-2"><div class="field"><label class="label is-small">Cidade</label><div class="control"><input class="input is-small" type="text" id="filterCity"></div></div></div>
+              <div class="column is-1"><div class="field"><label class="label is-small">Qualidade</label><div class="control"><div class="select is-small is-fullwidth"><select id="filterQuality"><option value="">Todas</option><option value="quente">Quente</option><option value="morno">Morno</option><option value="frio">Frio</option></select></div></div></div></div>
+              <div class="column is-2"><div class="field"><label class="label is-small">Status</label><div class="control"><div class="select is-small is-fullwidth"><select id="filterStatus"><option value="">Todos</option></select></div></div></div></div>
+              <div class="column is-1"><div class="field"><label class="label is-small">Temp.</label><div class="control"><div class="select is-small is-fullwidth"><select id="filterTemperature"><option value="">Todas</option><option value="frio">Frio</option><option value="morno">Morno</option><option value="quente">Quente</option></select></div></div></div></div>
+              <div class="column is-1"><div class="field"><label class="label is-small">Camp.</label><div class="control"><div class="select is-small is-fullwidth"><select id="filterCampaign"><option value="">Todas</option></select></div></div></div></div>
+              <div class="column is-1"><label class="label is-small">&nbsp;</label><button class="button is-primary is-small is-fullwidth" id="applyFilters"><span class="icon"><i class="fas fa-filter"></i></span></button></div>
+            </div>
+          </div>
+
+          <div id="bulkActions" class="box" style="display:none;">
+            <div class="level">
+              <div class="level-left"><span class="has-text-weight-bold" id="selectedCount">0 selecionados</span></div>
+              <div class="level-right">
+                <div class="buttons are-small">
+                  <button class="button is-success" onclick="bulkUpdate('interested', true)">Interessado</button>
+                  <button class="button is-danger" onclick="bulkUpdate('contacted', true)">Contatado</button>
+                  <button class="button is-warning" onclick="bulkUpdate('temperature', 'quente')">Quente</button>
+                  <button class="button is-danger is-light" onclick="bulkUpdate('commercial_status', 'lead inválido')">Inválido</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="table is-striped is-hoverable is-fullwidth" id="leadsTable">
+              <thead><tr><th><input type="checkbox" id="selectAll"></th><th>Empresa</th><th>Telefone</th><th>Site</th><th>Cidade</th><th>Qualidade</th><th>Score</th><th>Status</th><th>Temp.</th><th>Maps</th><th>Ações</th></tr></thead>
+              <tbody id="leadsBody"></tbody>
+            </table>
+          </div>
+
+          <nav class="pagination is-centered mt-3" role="navigation">
+            <button class="pagination-previous" id="prevPage">Anterior</button>
+            <button class="pagination-next" id="nextPage">Próximo</button>
+            <ul class="pagination-list" id="paginationList"></ul>
+          </nav>
+          <p class="help has-text-centered" id="paginationInfo"></p>
+        </div></div>
+
+        <!-- Import Modal -->
+        <div class="modal" id="importModal">
+          <div class="modal-background"></div>
+          <div class="modal-card">
+            <header class="modal-card-head"><p class="modal-card-title">Importar CSV</p><button class="delete" data-dismiss="modal"></button></header>
+            <section class="modal-card-body">
+              <div class="field">
+                <div class="file is-boxed">
+                  <label class="file-label">
+                    <input class="file-input" type="file" id="importFile" accept=".csv">
+                    <span class="file-cta"><span class="file-icon"><i class="fas fa-upload"></i></span><span class="file-label">CSV (; separado)</span></span>
+                  </label>
+                </div>
+              </div>
+              <div id="importResult" class="mt-2"></div>
+            </section>
+            <footer class="modal-card-foot">
+              <button class="button is-success" id="doImport">Importar</button>
+              <button class="button" data-dismiss="modal">Cancelar</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEAD DETAIL PAGE -->
+      <div id="page-lead-detail" class="page" style="display:none;">
+        <div class="columns"><div class="column is-12">
+          <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul><li><a href="#/leads">Leads</a></li><li class="is-active"><a href="#" id="breadcrumbLead">Carregando...</a></li></ul>
+          </nav>
+          <div id="leadDetail"><div class="has-text-centered py-6"><span class="icon is-large has-text-grey-light"><i class="fas fa-spinner fa-pulse fa-3x"></i></span><p class="has-text-grey">Carregando lead...</p></div></div>
+        </div></div>
+      </div>
+
+      <!-- CAMPAIGNS PAGE -->
+      <div id="page-campaigns" class="page" style="display:none;">
+        <div class="columns"><div class="column is-12">
+          <div class="level">
+            <div class="level-left"><h1 class="title is-4"><span class="icon"><i class="fas fa-folder"></i></span> Campanhas</h1></div>
+            <div class="level-right"><button class="button is-primary" id="newCampaignBtn"><span class="icon"><i class="fas fa-plus"></i></span><span>Nova Campanha</span></button></div>
+          </div>
+          <div id="campaignsList" class="columns is-multiline"></div>
+        </div></div>
+
+        <div class="modal" id="campaignModal">
+          <div class="modal-background"></div>
+          <div class="modal-card">
+            <header class="modal-card-head"><p class="modal-card-title">Nova Campanha</p><button class="delete" data-dismiss="modal"></button></header>
+            <section class="modal-card-body">
+              <form id="campaignForm">
+                <div class="field"><label class="label">Nome</label><div class="control"><input class="input" type="text" id="campaignName" required></div></div>
+                <div class="field"><label class="label">Nicho</label><div class="control"><input class="input" type="text" id="campaignNiche" required></div></div>
+                <div class="field"><label class="label">Cidade</label><div class="control"><input class="input" type="text" id="campaignCity" required></div></div>
+                <div class="field"><label class="label">Obs</label><div class="control"><textarea class="textarea" id="campaignNotes"></textarea></div></div>
+              </form>
+            </section>
+            <footer class="modal-card-foot">
+              <button class="button is-success" id="saveCampaign">Salvar</button>
+              <button class="button" data-dismiss="modal">Cancelar</button>
+            </footer>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DASHBOARD PAGE -->
+      <div id="page-dashboard" class="page" style="display:none;">
+        <div class="columns"><div class="column is-12"><h1 class="title is-4"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</h1></div></div>
+        <div class="columns is-multiline" id="metricsCards">
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Total</p><p class="title is-3" id="totalLeads">0</p></div></div>
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Contatados</p><p class="title is-3" id="contactedCount">0</p></div></div>
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Interessados</p><p class="title is-3" id="interestedCount">0</p></div></div>
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Fechados</p><p class="title is-3" id="closedCount">0</p></div></div>
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Propostas</p><p class="title is-3" id="proposalsCount">0</p></div></div>
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Com Site</p><p class="title is-3" id="withWebsite">0</p></div></div>
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Sem Site</p><p class="title is-3" id="withoutWebsite">0</p></div></div>
+          <div class="column is-3"><div class="box metric-box has-text-centered"><p class="heading">Conversão</p><p class="title is-3" id="conversionRate">0%</p></div></div>
+        </div>
+        <div class="columns">
+          <div class="column is-6"><div class="box"><h2 class="title is-6">Qualidade</h2><canvas id="qualityChart"></canvas></div></div>
+          <div class="column is-6"><div class="box"><h2 class="title is-6">Status Comercial</h2><canvas id="statusChart"></canvas></div></div>
+        </div>
+        <div class="columns">
+          <div class="column is-6"><div class="box"><h2 class="title is-6">Fonte</h2><canvas id="sourceChart"></canvas></div></div>
+          <div class="column is-6"><div class="box"><h2 class="title is-6">Site</h2><canvas id="websiteChart"></canvas></div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ADD LEAD MODAL -->
+    <div class="modal" id="addLeadModal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head"><p class="modal-card-title">Adicionar Lead Manualmente</p><button class="delete" data-dismiss="modal"></button></header>
+        <section class="modal-card-body">
+          <div class="columns is-multiline">
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Empresa *</label><div class="control"><input class="input is-small" type="text" id="addCompanyName" placeholder="Nome da empresa"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Telefone</label><div class="control"><input class="input is-small" type="text" id="addPhone" placeholder="(11) 99999-9999"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Website</label><div class="control"><input class="input is-small" type="text" id="addWebsite" placeholder="https://"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">E-mail</label><div class="control"><input class="input is-small" type="email" id="addEmail" placeholder="contato@empresa.com"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Instagram</label><div class="control"><input class="input is-small" type="text" id="addInstagram" placeholder="@empresa"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Endereço</label><div class="control"><input class="input is-small" type="text" id="addAddress" placeholder="Rua, número"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Cidade</label><div class="control"><input class="input is-small" type="text" id="addCity" placeholder="Cidade"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Estado</label><div class="control"><input class="input is-small" type="text" id="addState" placeholder="SP"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Nicho</label><div class="control"><input class="input is-small" type="text" id="addNiche" placeholder="Ex: Salão de Beleza"></div></div>
+            </div>
+            <div class="column is-6">
+              <div class="field"><label class="label is-small">Campanha</label><div class="control"><div class="select is-small is-fullwidth"><select id="addCampaign"><option value="">Nenhuma</option></select></div></div></div>
+            </div>
+          </div>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-primary" onclick="saveManualLead()">Salvar</button>
+          <button class="button" data-dismiss="modal">Cancelar</button>
+        </footer>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

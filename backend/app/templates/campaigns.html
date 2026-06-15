@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="columns">
+  <div class="column is-12">
+    <div class="level">
+      <div class="level-left">
+        <h1 class="title is-4">
+          <span class="icon"><i class="fas fa-folder"></i></span>
+          Campanhas
+        </h1>
+      </div>
+      <div class="level-right">
+        <button class="button is-primary" id="newCampaignBtn">
+          <span class="icon"><i class="fas fa-plus"></i></span>
+          <span>Nova Campanha</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="campaignsList" class="columns is-multiline"></div>
+  </div>
+</div>
+
+<!-- New Campaign Modal -->
+<div class="modal" id="campaignModal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Nova Campanha</p>
+      <button class="delete" data-dismiss="modal"></button>
+    </header>
+    <section class="modal-card-body">
+      <form id="campaignForm">
+        <div class="field">
+          <label class="label">Nome da Campanha</label>
+          <div class="control">
+            <input class="input" type="text" id="campaignName" required placeholder="Ex: Clínicas Odontológicas Vitória">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Nicho</label>
+          <div class="control">
+            <input class="input" type="text" id="campaignNiche" required placeholder="Ex: clínica odontológica">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Cidade</label>
+          <div class="control">
+            <input class="input" type="text" id="campaignCity" required placeholder="Ex: Vitória ES">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Observações</label>
+          <div class="control">
+            <textarea class="textarea" id="campaignNotes" placeholder="Observações sobre a campanha"></textarea>
+          </div>
+        </div>
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success" id="saveCampaign">Salvar</button>
+      <button class="button" data-dismiss="modal">Cancelar</button>
+    </footer>
+  </div>
+</div>
+{% endblock %}
