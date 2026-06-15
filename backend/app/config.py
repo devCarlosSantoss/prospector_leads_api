@@ -8,7 +8,10 @@ UPLOAD_DIR = BASE_DIR / "uploads"
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-DATABASE_URL = f"sqlite:///{DATA_DIR}/leads.db"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    f"sqlite:///{DATA_DIR}/leads.db",
+)
 
 SCRAPING_CONFIG = {
     "timeout": 30,
