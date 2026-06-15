@@ -11,6 +11,7 @@ from app.config import SCRAPING_CONFIG
 class LeadEnricher:
     def __init__(self):
         self.headers = {"User-Agent": SCRAPING_CONFIG["user_agent"]}
+        self._sem = asyncio.Semaphore(5)
 
     async def enrich(self, lead: dict) -> dict:
         tasks = []
@@ -47,7 +48,7 @@ class LeadEnricher:
 
         try:
             async with httpx.AsyncClient(
-                timeout=15,
+                timeout=10,
                 follow_redirects=True,
                 headers=self.headers,
                 verify=False,

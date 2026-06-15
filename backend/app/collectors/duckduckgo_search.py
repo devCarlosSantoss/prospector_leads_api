@@ -273,7 +273,7 @@ class DuckDuckGoCollector(BaseCollector):
             return result
 
         try:
-            resp = await client.get(url, timeout=15)
+            resp = await client.get(url, timeout=10)
             if resp.status_code != 200:
                 return result
 
