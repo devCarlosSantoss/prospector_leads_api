@@ -64,12 +64,13 @@ function showPage(pageName) {
 function handleRoute() {
   const page = getCurrentPage();
   if (page === 'lead') {
+    saveLeadsListState();
     showPage('lead-detail');
     const id = getLeadIdFromHash();
     if (id) loadLeadDetail(parseInt(id));
   } else {
     showPage(page);
-    if (page === 'leads') { currentPage = 1; loadLeads(); loadAddCampaignSelect(); }
+    if (page === 'leads') { restoreLeadsListState(); loadLeads(); loadAddCampaignSelect(); }
     if (page === 'campaigns') loadCampaigns();
     if (page === 'dashboard') loadDashboard();
     if (page === 'search') { loadSearchHistory(); loadCampaignSelect(); }
@@ -217,6 +218,25 @@ async function loadSearchHistory() {
 // ======== LEADS PAGE ========
 let currentPage = 1, totalPages = 1, selectedLeads = new Set();
 let leadsFilterState = {};
+let leadsListState = null;
+
+function saveLeadsListState() {
+  if (getCurrentPage() !== 'leads') return;
+  leadsListState = { currentPage };
+  ['filterSearch','filterNiche','filterCity','filterQuality','filterStatus','filterTemperature','filterCampaign'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) leadsListState[id] = el.value;
+  });
+}
+
+function restoreLeadsListState() {
+  if (!leadsListState) return;
+  currentPage = leadsListState.currentPage || 1;
+  ['filterSearch','filterNiche','filterCity','filterQuality','filterStatus','filterTemperature','filterCampaign'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && leadsListState[id] !== undefined) el.value = leadsListState[id];
+  });
+}
 
 if (document.getElementById('leadsTable')) {
   loadFilterStatuses();
@@ -437,8 +457,8 @@ function renderLeadDetail(lead) {
         ${field('Categoria','category', lead.category)}
         ${textarea('Descrição','description', lead.description, 3)}
         ${field('Site','website', lead.website, lead.has_website ? '<span class="tag is-success">Tem site</span>' : '<span class="tag is-light">Sem site</span>')}
-        ${field('Telefone','phone', lead.phone)}
-        ${field('WhatsApp','whatsapp_link', lead.whatsapp_link, lead.whatsapp_link ? `<a class="button is-success is-small" href="${h(lead.whatsapp_link)}" target="_blank"><i class="fab fa-whatsapp"></i></a>` : '')}
+        ${field('Telefone','phone', lead.phone, '', 'tel')}
+        ${field('WhatsApp','whatsapp_link', lead.whatsapp_link, lead.whatsapp_link ? `<a class="button is-success is-small" href="${h(lead.whatsapp_link)}" target="_blank"><i class="fab fa-whatsapp"></i></a>` : '', 'tel')}
         ${field('Email','email', lead.email)}
         ${field('Instagram','instagram', lead.instagram, lead.instagram ? `<a class="button is-link is-small is-light" href="${h(lead.instagram)}" target="_blank"><i class="fab fa-instagram"></i></a>` : '')}
         ${field('Facebook','facebook', lead.facebook)}
@@ -526,6 +546,38 @@ function renderLeadDetail(lead) {
   </div>`;
 
   document.getElementById('leadDetail').innerHTML = html;
+
+  setupWhatsAppAutoConvert();
+}
+
+function setupWhatsAppAutoConvert() {
+  const phoneInput = document.getElementById('ed-phone');
+  const whatsappInput = document.getElementById('ed-whatsapp_link');
+
+  if (phoneInput) {
+    phoneInput.addEventListener('blur', function() {
+      const digits = this.value.replace(/\D/g, '');
+      if (digits.length >= 10) {
+        const link = digits.startsWith('55') ? `https://wa.me/${digits}` : `https://wa.me/55${digits}`;
+        if (whatsappInput && !whatsappInput.value.trim()) {
+          whatsappInput.value = link;
+        }
+      }
+    });
+  }
+
+  if (whatsappInput) {
+    whatsappInput.addEventListener('blur', function() {
+      const val = this.value.trim();
+      if (val && !val.startsWith('http://') && !val.startsWith('https://')) {
+        const digits = val.replace(/\D/g, '');
+        if (digits.length >= 8) {
+          const link = digits.startsWith('55') ? `https://wa.me/${digits}` : `https://wa.me/55${digits}`;
+          this.value = link;
+        }
+      }
+    });
+  }
 }
 
 function field(label, id, value, extra, type, placeholder) {
@@ -557,6 +609,19 @@ window.saveLead = async (id) => {
   });
   const v = document.getElementById('ed-estimated_value');
   if (v && v.value) updates.estimated_value = parseFloat(v.value.replace('R$','').trim()) || null;
+
+  if (updates.whatsapp_link && !updates.whatsapp_link.startsWith('http')) {
+    const digits = updates.whatsapp_link.replace(/\D/g, '');
+    if (digits.length >= 8) {
+      updates.whatsapp_link = digits.startsWith('55') ? `https://wa.me/${digits}` : `https://wa.me/55${digits}`;
+    }
+  }
+  if (!updates.whatsapp_link && updates.phone) {
+    const digits = updates.phone.replace(/\D/g, '');
+    if (digits.length >= 10) {
+      updates.whatsapp_link = digits.startsWith('55') ? `https://wa.me/${digits}` : `https://wa.me/55${digits}`;
+    }
+  }
 
   try {
     await api(`/leads/${id}`, { method:'PUT', body: JSON.stringify(updates) });
