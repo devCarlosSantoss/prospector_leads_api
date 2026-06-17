@@ -14,7 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt && \
     playwright install chromium && \
-    playwright install-deps chromium
+    apt-get install -y --no-install-recommends \
+        fonts-freefont-ttf \
+        fonts-unifont \
+    && playwright install-deps chromium 2>/dev/null || true
 
 COPY backend/ .
 
